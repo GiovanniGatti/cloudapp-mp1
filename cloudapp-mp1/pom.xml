@@ -1,0 +1,45 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>cloudapp-mp1</groupId>
+	<artifactId>cloudapp-mp1</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Cloud Computing Applications :: MP1</name>
+	<description>Java Essentials Programming Assignment</description>
+  
+	<properties>
+		<junit.version>4.12</junit.version>
+	</properties>
+  
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<resources>
+			<resource>
+			<directory>src</directory>
+			<excludes>
+				<exclude>**/*.java</exclude>
+			</excludes>
+			</resource>
+		</resources>
+    
+		<testSourceDirectory>test</testSourceDirectory>
+    
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.3</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+		</plugins>
+ 	</build>
+  
+	<dependencies>
+		  <dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+		</dependency>
+	</dependencies>
+</project>
