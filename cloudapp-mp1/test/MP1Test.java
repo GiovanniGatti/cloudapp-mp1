@@ -1,3 +1,7 @@
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -8,13 +12,12 @@ public class MP1Test {
         MP1 mp1 = new MP1("giovanni.gatti.pinheiro@gmail.com", "./test/resources/simple-input.txt");
         String[] ret = mp1.process();
 
-        Assert.assertNotNull(ret);
-        Assert.assertTrue(ret.length == 5);
-        Assert.assertEquals("word1", ret[0]);
-        Assert.assertEquals("word2", ret[1]);
-        Assert.assertEquals("word3", ret[2]);
-        Assert.assertEquals("word4", ret[3]);
-        Assert.assertEquals("word5", ret[4]);
+        Assert.assertThat(ret, is(not(nullValue())));
+        Assert.assertThat(ret.length, is(5));
+        Assert.assertEquals(ret[0], is("word1"));
+        Assert.assertEquals(ret[1], is("word2"));
+        Assert.assertEquals(ret[2], is("word3"));
+        Assert.assertEquals(ret[3], is("word4"));
+        Assert.assertEquals(ret[4], is("word5"));
     }
-
 }
