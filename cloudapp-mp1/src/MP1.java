@@ -19,6 +19,7 @@ import java.util.StringTokenizer;
 public class MP1 {
     private static final int DEFAULT_SIZE = 1024;
     public static final int OUTPUT_LIMIT = 20;
+    private CountRegister register = new CountRegister();
     Random generator;
     String userName;
     String inputFileName;
@@ -158,12 +159,17 @@ public class MP1 {
     }
 
     public String[] process() throws Exception {
-        String contents = readFile(inputFileName);
+        List<String> contents = readFile(inputFileName);
 
-        CountRegister register = new CountRegister();
-        StringTokenizer tokenizer = new StringTokenizer(contents, delimiters + "\n");
-        while (tokenizer.hasMoreTokens()) {
-            register.count(new Word(tokenizer.nextToken(), stopWordsArray));
+        if (userName == null) {
+            for (String line : contents) {
+                processLine(line);
+            }
+        } else {
+            List<Integer> indexes = Arrays.asList(getIndexes());
+            for (int i : indexes) {
+                processLine(contents.get(i));
+            }
         }
 
         String[] ret = new String[OUTPUT_LIMIT];
@@ -175,25 +181,26 @@ public class MP1 {
         return ret;
     }
 
+    private void processLine(String line) {
+        StringTokenizer tokenizer = new StringTokenizer(line, delimiters);
+        while (tokenizer.hasMoreTokens()) {
+            register.count(new Word(tokenizer.nextToken(), stopWordsArray));
+        }
+    }
+
     private List<String> readFile(String inputFileName) throws IOException {
-        // List<Integer> indexes = Arrays.asList(getIndexes());
         File file = new File(inputFileName);
         if (!file.exists() || !file.isFile() || !file.canRead()) {
             throw new UnsupportedOperationException("It can only process readable text files");
         }
 
-        // StringBuilder contents = new StringBuilder(DEFAULT_SIZE);
         List<String> lines = new ArrayList<String>(DEFAULT_SIZE);
 
         try (InputStream in = Files.newInputStream(FileSystems.getDefault().getPath(file.getPath()));
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
             String line = null;
-            // int index = 0;
             while ((line = reader.readLine()) != null) {
-                // if (indexes.contains(index)) {
                 lines.add(line);
-                // }
-                // index++;
             }
         }
 
