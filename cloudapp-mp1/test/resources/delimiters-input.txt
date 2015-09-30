@@ -1,0 +1,16 @@
+word1_word2_word3
+word4,	word5
+word1?word2
+word3.word4
+word5.
+[word1][word2
+word3(word4)
+word5*
+word1*word2
+word3	
+word4	word1
+word2/
+word3
+word1
+word2
+word1

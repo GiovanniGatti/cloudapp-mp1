@@ -7,15 +7,18 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
+import java.util.StringTokenizer;
 
 public class MP1 {
     private static final int DEFAULT_SIZE = 1024;
+    public static final int OUTPUT_LIMIT = 20;
     Random generator;
     String userName;
     String inputFileName;
@@ -34,17 +37,48 @@ public class MP1 {
 
     private static class Word {
         private final String word;
+        private final String[] stopWords;
 
-        public Word(String word) {
-            this.word = word;
+        public Word(String word, String[] stopWords) {
+            this.word = word.trim().toLowerCase();
+            this.stopWords = stopWords;
         }
 
         public String getWord() {
             return word;
         }
+
+        public boolean isStopWord() {
+            return Arrays.asList(stopWords).contains(word);
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((word == null) ? 0 : word.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Word other = (Word) obj;
+            if (word == null) {
+                if (other.word != null)
+                    return false;
+            } else if (!word.equals(other.word))
+                return false;
+            return true;
+        }
     }
 
-    private static class Counter implements Comparator<Counter> {
+    private static class Counter implements Comparable<Counter> {
         private final Word word;
         private int count = 1;
 
@@ -65,26 +99,32 @@ public class MP1 {
         }
 
         @Override
-        public int compare(Counter o1, Counter o2) {
-            // TODO Auto-generated method stub
-            return 0;
+        public int compareTo(Counter o) {
+            return getCount() - o.getCount();
         }
     }
 
-    private static class Register {
+    private static class CountRegister {
         private final Map<Word, Counter> register = new HashMap<Word, Counter>();
 
         public void count(Word word) {
-            if (register.containsKey(word)) {
-                register.get(word).count();
-            } else {
-                register.put(word, new Counter(word));
+            if (!word.isStopWord()) {
+                if (register.containsKey(word)) {
+                    register.get(word).count();
+                } else {
+                    register.put(word, new Counter(word));
+                }
             }
         }
 
-        public void getOrdered() {
-            // Collections.sort(register.values());
-            // TODO
+        public List<Word> getOrdered(int topLimit) {
+            List<Counter> countValues = new ArrayList<Counter>(register.values());
+            Collections.sort(countValues, Collections.reverseOrder());
+            List<Word> words = new ArrayList<Word>();
+            for (int i = 0; i < topLimit && i < countValues.size(); i++) {
+                words.add(countValues.get(i).getWord());
+            }
+            return words;
         }
     }
 
@@ -118,32 +158,46 @@ public class MP1 {
     }
 
     public String[] process() throws Exception {
-        String[] ret = new String[20];
-
         String contents = readFile(inputFileName);
 
-        Set<Counter> selectiveWordCounter = new HashSet<Counter>();
+        CountRegister register = new CountRegister();
+        StringTokenizer tokenizer = new StringTokenizer(contents, delimiters + "\n");
+        while (tokenizer.hasMoreTokens()) {
+            register.count(new Word(tokenizer.nextToken(), stopWordsArray));
+        }
+
+        String[] ret = new String[OUTPUT_LIMIT];
+        List<Word> topWords = register.getOrdered(OUTPUT_LIMIT);
+        for (int i = 0; i < OUTPUT_LIMIT && i < topWords.size(); i++) {
+            ret[i] = topWords.get(i).getWord();
+        }
 
         return ret;
     }
 
-    private String readFile(String inputFileName) throws IOException {
+    private List<String> readFile(String inputFileName) throws IOException {
+        // List<Integer> indexes = Arrays.asList(getIndexes());
         File file = new File(inputFileName);
         if (!file.exists() || !file.isFile() || !file.canRead()) {
             throw new UnsupportedOperationException("It can only process readable text files");
         }
 
-        StringBuilder contents = new StringBuilder(DEFAULT_SIZE);
+        // StringBuilder contents = new StringBuilder(DEFAULT_SIZE);
+        List<String> lines = new ArrayList<String>(DEFAULT_SIZE);
 
         try (InputStream in = Files.newInputStream(FileSystems.getDefault().getPath(file.getPath()));
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
             String line = null;
+            // int index = 0;
             while ((line = reader.readLine()) != null) {
-                contents.append(line + "\n");
+                // if (indexes.contains(index)) {
+                lines.add(line);
+                // }
+                // index++;
             }
         }
 
-        return contents.toString();
+        return lines;
     }
 
     public static void main(String[] args) throws Exception {
