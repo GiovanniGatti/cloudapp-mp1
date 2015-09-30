@@ -36,7 +36,7 @@ public class MP1 {
             "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than",
             "too", "very", "s", "t", "can", "will", "just", "don", "should", "now" };
 
-    private static class Word {
+    private static class Word implements Comparable<Word> {
         private final String word;
         private final String[] stopWords;
 
@@ -77,6 +77,11 @@ public class MP1 {
                 return false;
             return true;
         }
+
+        @Override
+        public int compareTo(Word o) {
+            return o.getWord().compareTo(getWord());
+        }
     }
 
     private static class Counter implements Comparable<Counter> {
@@ -101,7 +106,12 @@ public class MP1 {
 
         @Override
         public int compareTo(Counter o) {
-            return getCount() - o.getCount();
+            int count = getCount() - o.getCount();
+            if (count == 0) {
+                // lexigraphy
+                return getWord().compareTo(o.getWord());
+            }
+            return count;
         }
     }
 
